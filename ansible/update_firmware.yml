@@ -1,0 +1,23 @@
+---
+- name: Upgrade RouterBOOT and verify RouterOS version
+  block:
+    - community.routeros.command:
+        commands:
+          - /system package update set channel=stable
+          - /system package update check-for-updates
+          - /system package update download
+          - /system reboot
+          - /system routerboard upgrade
+          - /system reboot
+      async: 1
+      poll: 0
+      ignore_errors: true
+
+    - wait_for_connection:
+        delay: 30
+        timeout: 600
+
+    - community.routeros.command:
+        commands:
+          - :put [/system resource get version]
+      register: version_info

@@ -1,0 +1,13 @@
+---
+- name: Test connection to MikroTik
+  hosts: core
+  gather_facts: no
+  tasks:
+    - name: Run command
+      community.routeros.command:
+        commands:
+          - /system resource print
+      register: result
+    - name: Show output
+      debug:
+        var: result.stdout_lines

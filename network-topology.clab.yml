@@ -1,0 +1,187 @@
+name: network-topology
+
+mgmt:
+  network: clab-mgmt
+  ipv4-subnet: 192.168.0.0/16
+
+topology:
+  kinds:
+    linux:
+      image: alpine:latest
+    mikrotik_ros:
+      image: my-mikrotik:with-kar
+
+  nodes:
+    
+    edge-r1:
+      kind: mikrotik_ros
+      mgmt-ipv4: 192.168.10.2
+      startup-config: configs/edge-r1-init.txt
+      binds:
+        - /home/kar/.ssh/edge-rsa.pub:/key.pub:ro
+    
+    srv-l3-1:
+      kind: mikrotik_ros
+      mgmt-ipv4: 192.168.30.1
+      startup-config: configs/srv-l3-1-init.txt
+
+    srv-l3-2:
+      kind: mikrotik_ros
+      mgmt-ipv4: 192.168.30.2
+      startup-config: configs/srv-l3-2-init.txt
+
+    core-r1:
+      kind: mikrotik_ros
+      mgmt-ipv4: 192.168.20.1
+      startup-config: configs/core-r1-init.txt
+
+    core-r2:
+      kind: mikrotik_ros
+      mgmt-ipv4: 192.168.20.2
+      startup-config: configs/core-r2-init.txt
+
+    agg-l3-1:
+      kind: mikrotik_ros
+      mgmt-ipv4: 192.168.40.1
+      startup-config: configs/agg-l3-1-init.txt
+
+    agg-l3-2:
+      kind: mikrotik_ros
+      mgmt-ipv4: 192.168.40.2
+      startup-config: configs/agg-l3-2-init.txt
+
+    agg-l3-3:
+      kind: mikrotik_ros
+      mgmt-ipv4: 192.168.40.3
+      startup-config: configs/agg-l3-3-init.txt
+
+    agg-l3-4:
+      kind: mikrotik_ros
+      mgmt-ipv4: 192.168.40.4
+      startup-config: configs/agg-l3-4-init.txt
+
+    access-l2-1:
+      kind: mikrotik_ros
+      mgmt-ipv4: 192.168.50.1
+      startup-config: configs/access-l2-1-init.txt
+
+    access-l2-2:
+      kind: mikrotik_ros
+      mgmt-ipv4: 192.168.50.2
+      startup-config: configs/access-l2-2-init.txt
+
+    access-l2-3:
+      kind: mikrotik_ros
+      mgmt-ipv4: 192.168.50.3
+      startup-config: configs/access-l2-3-init.txt
+
+    access-l2-4:
+      kind: mikrotik_ros
+      mgmt-ipv4: 192.168.50.4
+      startup-config: configs/access-l2-4-init.txt
+
+    access-l2-5:
+      kind: mikrotik_ros
+      mgmt-ipv4: 192.168.50.5
+      startup-config: configs/access-l2-5-init.txt
+
+    access-l2-6:
+      kind: mikrotik_ros
+      mgmt-ipv4: 192.168.50.6
+      startup-config: configs/access-l2-6-init.txt
+
+    access-l2-7:
+      kind: mikrotik_ros
+      mgmt-ipv4: 192.168.50.7
+      startup-config: configs/access-l2-7-init.txt
+
+    access-l2-8:
+      kind: mikrotik_ros
+      mgmt-ipv4: 192.168.50.8
+      startup-config: configs/access-l2-8-init.txt
+
+    internet:
+      kind: linux
+      image: alpine:latest
+      exec:
+        - ip addr add 77.88.8.8/31 dev eth1
+        - ip link set eth1 up
+
+    client1:
+      kind: linux
+      exec: [ "udhcpc -i eth1 -b" ]
+
+    client2:
+      kind: linux
+      exec: [ "udhcpc -i eth1 -b" ]
+
+    client3:
+      kind: linux
+      exec: [ "udhcpc -i eth1 -b" ]
+
+    client4:
+      kind: linux
+      exec: [ "udhcpc -i eth1 -b" ]
+
+    client5:
+      kind: linux
+      exec: [ "udhcpc -i eth1 -b" ]
+
+    client6:
+      kind: linux
+      exec: [ "udhcpc -i eth1 -b" ]
+
+    client7:
+      kind: linux
+      exec: [ "udhcpc -i eth1 -b" ]
+
+    client8:
+      kind: linux
+      exec: [ "udhcpc -i eth1 -b" ]
+
+    server1:
+      kind: linux
+      mgmt-ipv4: 192.168.0.101
+
+    server2:
+      kind: linux
+      mgmt-ipv4: 192.168.0.102
+
+
+  links:
+    - endpoints: [ "server1:eth1", "srv-l3-1:eth1" ]
+    - endpoints: [ "server1:eth2", "srv-l3-2:eth1" ]
+    - endpoints: [ "server2:eth1", "srv-l3-1:eth2" ]
+    - endpoints: [ "server2:eth2", "srv-l3-2:eth2" ]
+    - endpoints: [ "srv-l3-1:eth3", "core-r1:eth1" ]
+    - endpoints: [ "srv-l3-1:eth4", "core-r2:eth1" ]
+    - endpoints: [ "srv-l3-2:eth3", "core-r1:eth2" ]
+    - endpoints: [ "srv-l3-2:eth4", "core-r2:eth2" ]
+    - endpoints: [ "edge-r1:eth1", "core-r1:eth8" ]
+    - endpoints: [ "edge-r1:eth2", "core-r2:eth8" ]
+    - endpoints: [ "edge-r1:eth3", "internet:eth1" ]
+    - endpoints: [ "core-r1:eth7", "core-r2:eth7" ]
+    - endpoints: [ "core-r1:eth3", "agg-l3-1:eth1" ]
+    - endpoints: [ "core-r1:eth4", "agg-l3-2:eth1" ]
+    - endpoints: [ "core-r1:eth5", "agg-l3-3:eth1" ]
+    - endpoints: [ "core-r1:eth6", "agg-l3-4:eth1" ]
+    - endpoints: [ "core-r2:eth3", "agg-l3-1:eth3" ]
+    - endpoints: [ "core-r2:eth4", "agg-l3-2:eth3" ]
+    - endpoints: [ "core-r2:eth5", "agg-l3-3:eth3" ]
+    - endpoints: [ "core-r2:eth6", "agg-l3-4:eth3" ]
+    - endpoints: [ "agg-l3-1:eth2", "access-l2-1:eth1" ]
+    - endpoints: [ "agg-l3-1:eth4", "access-l2-2:eth1" ]
+    - endpoints: [ "agg-l3-2:eth2", "access-l2-3:eth1" ]
+    - endpoints: [ "agg-l3-2:eth4", "access-l2-4:eth1" ]
+    - endpoints: [ "agg-l3-3:eth2", "access-l2-5:eth1" ]
+    - endpoints: [ "agg-l3-3:eth4", "access-l2-6:eth1" ]
+    - endpoints: [ "agg-l3-4:eth2", "access-l2-7:eth1" ]
+    - endpoints: [ "agg-l3-4:eth4", "access-l2-8:eth1" ]
+    - endpoints: [ "access-l2-1:eth2", "client1:eth1" ]
+    - endpoints: [ "access-l2-2:eth2", "client2:eth1" ]
+    - endpoints: [ "access-l2-3:eth2", "client3:eth1" ]
+    - endpoints: [ "access-l2-4:eth2", "client4:eth1" ]
+    - endpoints: [ "access-l2-5:eth2", "client5:eth1" ]
+    - endpoints: [ "access-l2-6:eth2", "client6:eth1" ]
+    - endpoints: [ "access-l2-7:eth2", "client7:eth1" ]
+    - endpoints: [ "access-l2-8:eth2", "client8:eth1" ]

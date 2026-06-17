@@ -1,0 +1,74 @@
+/system/identity
+set name=edge-r1
+
+/user
+add name=kar password=0 group=full
+
+/interface/ethernet/
+set [find default-name=ether3] name=ether3-WAN3
+
+/ip service
+set telnet disabled=yes
+set ftp disabled=yes
+set www disabled=yes
+set api disabled=yes
+set api-ssl disabled=yes
+set winbox disabled=yes
+set ssh disabled=no
+set strong-crypto=yes
+
+/interface/bridge/
+add name=LAN
+
+/interface/bridge/port/
+add bridge=LAN interface=ether1
+add bridge=LAN interface=ether2
+
+/ip/address/
+add address=192.168.0.2/24 interface=ether3-WAN3
+
+/ip/address/
+add address=192.168.1.1/24 interface=LAN
+
+/ip/dns/
+set servers=77.88.8.8,77.88.8.1
+
+/ip/route/
+add dst-address=0.0.0.0/0 gateway=192.168.0.1
+
+/ip firewall nat
+add chain=srcnat out-interface=ether3-WAN3 action=masquerade
+
+/ipv6/settings/
+set disable-ipv6=yes
+
+/ip firewall address-list
+add address=192.168.0.1 list=admin
+
+/ip firewall filter
+add chain=input action=accept connection-state=established
+add chain=input action=accept connection-state=related
+add chain=input action=drop connection-state=invalid
+add chain=input action=accept protocol=icmp icmp-options=8
+add chain=input action=accept protocol=icmp icmp-options=11
+add chain=input action=accept protocol=icmp icmp-options=3:4
+add chain=input action=accept protocol=tcp in-interface=LAN 
+src-address=192.168.1.0/24 dst-port=22
+add chain=input action=accept protocol=tcp in-interface=LAN 
+src-address-list=admin dst-port=22
+add chain=input action=drop
+add chain=forward action=accept connection-state=established
+add chain=forward action=accept connection-state=related
+add chain=forward action=drop connection-state=invalid
+add chain=forward action=accept in-interface=LAN src-address=192.168.1.0/24
+add chain=forward action=accept protocol=tcp dst-address=192.168.0.1 dst-port=3389
+add chain=forward action=drop
+
+/system/ntp/client/
+set enabled=yes
+
+/system/ntp/client/servers/
+add address=ru.pool.ntp.org
+
+/system/clock/
+set time-zone-autodetect=no time-zone-name=Asia/Krasnoyarsk

@@ -1,0 +1,12 @@
+- name: edge-ssh
+  hosts: edge
+  gather_facts: no
+
+  tasks:
+    - name: egde-ssh
+      community.routeros.command:
+        commands:
+          - /user ssh-keys import user=kar public-key-file=kar_ssh_key.pub
+          - /ip ssh set always-allow-password-login=no
+          - /user set admin disabled=yes
+         
