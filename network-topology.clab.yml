@@ -15,10 +15,13 @@ topology:
     
     edge-r1:
       kind: mikrotik_ros
+      mgmt-ipv4: 192.168.10.1
+      startup-config: configs/edge-r1-init.txt
+
+    edge-r2:
+      kind: mikrotik_ros
       mgmt-ipv4: 192.168.10.2
       startup-config: configs/edge-r1-init.txt
-      binds:
-        - /home/kar/.ssh/edge-rsa.pub:/key.pub:ro
     
     srv-l3-1:
       kind: mikrotik_ros
@@ -100,11 +103,18 @@ topology:
       mgmt-ipv4: 192.168.50.8
       startup-config: configs/access-l2-8-init.txt
 
-    internet:
+    internet1:
       kind: linux
       image: alpine:latest
       exec:
         - ip addr add 77.88.8.8/31 dev eth1
+        - ip link set eth1 up
+
+    internet2:
+      kind: linux
+      image: alpine:latest
+      exec:
+        - ip addr add 77.88.8.1/31 dev eth1
         - ip link set eth1 up
 
     client1:
@@ -160,6 +170,10 @@ topology:
     - endpoints: [ "edge-r1:eth1", "core-r1:eth8" ]
     - endpoints: [ "edge-r1:eth2", "core-r2:eth8" ]
     - endpoints: [ "edge-r1:eth3", "internet:eth1" ]
+    - endpoints: [ "edge-r2:eth1", "core-r1:eth9" ]
+    - endpoints: [ "edge-r2:eth2", "core-r2:eth9" ]
+    - endpoints: [ "edge-r2:eth3", "internet2:eth1" ]
+    - endpoints: [ "edge-r1:eth4", "edge-r2:eth4" ]
     - endpoints: [ "core-r1:eth7", "core-r2:eth7" ]
     - endpoints: [ "core-r1:eth3", "agg-l3-1:eth1" ]
     - endpoints: [ "core-r1:eth4", "agg-l3-2:eth1" ]
