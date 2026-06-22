@@ -173,7 +173,6 @@ topology:
     - endpoints: [ "edge-r2:eth1", "core-r1:eth9" ]
     - endpoints: [ "edge-r2:eth2", "core-r2:eth9" ]
     - endpoints: [ "edge-r2:eth3", "internet2:eth1" ]
-    - endpoints: [ "edge-r1:eth4", "edge-r2:eth4" ]
     - endpoints: [ "core-r1:eth7", "core-r2:eth7" ]
     - endpoints: [ "core-r1:eth3", "agg-l3-1:eth1" ]
     - endpoints: [ "core-r1:eth4", "agg-l3-2:eth1" ]
